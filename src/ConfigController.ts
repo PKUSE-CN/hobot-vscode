@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { processUrl } from './Utils';
+import axios from 'axios';
 
 export const getToken = () => {
     const config = vscode.workspace.getConfiguration('hobot-vscode');
@@ -24,6 +25,24 @@ export const getProjectName = () => {
     const config = vscode.workspace.getConfiguration('hobot-vscode');
     const projectName = config.get<string>('projectName');
     return projectName;
+};
+
+export const getProjectId = async () => {
+    const config = vscode.workspace.getConfiguration('hobot-vscode');
+    const projectName = config.get<string>('projectName');
+    const { serviceUrl, token } = getToken();
+    const repoRes = await axios.get(`${serviceUrl}/hobot/openApi/findProject`, {
+        params: {
+            projectName,
+            projectVersion: 'vscode'
+        },
+        headers: {
+            // eslint-disable-next-line @typescript-eslint/naming-convention
+            Authorization: token,
+        }
+    });
+    const { projectId } = repoRes.data.data;
+    return projectId;
 };
 
 export const getProjectPath = () => {

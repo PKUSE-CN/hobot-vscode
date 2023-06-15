@@ -26,22 +26,29 @@
                 "icon": "$(refresh)"
             },
             {
+                "command": "hobot-vscode.checkResult.showBugs",
+                "title": "获取组件漏洞",
+                "icon": "$(bug)"
+            },
+            {
+                "command": "hobot-vscode.checkResult.listTree",
+                "title": "树形展开",
+                "icon": "$(list-tree)"
+            },
+            {
+                "command": "hobot-vscode.checkResult.listFlat",
+                "title": "平铺",
+                "icon": "$(list-flat)"
+            },
+            {
                 "command": "hobot-vscode.checkResult.checkProject",
-                "title": "cobot: 检测项目"
-            },
-            {
-                "command": "hobot-vscode.checkResult.filterResultEditor",
-                "title": "cobot: 筛选当前编辑器文件结果"
-            },
-            {
-                "command": "hobot-vscode.checkResult.filterResultExplorer",
-                "title": "cobot: 筛选文件资源管理器结果"
+                "title": "hobot: 检测项目"
             }
         ],
         "viewsContainers": {
             "activitybar": [
                 {
-                    "id": "cobot",
+                    "id": "hobot",
                     "title": "库博软件成分分析与同源漏洞检测工具软件",
                     "icon": "images/cobot_logo_svg.svg"
                 }
@@ -55,18 +62,14 @@
                     "group": "navigation"
                 }
             ],
-            "editor/context": [
+            "view/item/context": [
                 {
-                    "command": "hobot-vscode.checkResult.filterResultEditor",
-                    "group": "menu"
+                    "command": "hobot-vscode.checkResult.showBugs",
+                    "when": "view == checkResult && viewItem == hasBug",
+                    "group": "inline"
                 }
             ],
             "explorer/context": [
-                {
-                    "command": "hobot-vscode.checkResult.filterResultExplorer",
-                    "group": "menu",
-                    "when": "!explorerResourceIsFolder"
-                },
                 {
                     "command": "hobot-vscode.checkResult.checkProject",
                     "group": "menu",
@@ -75,10 +78,15 @@
             ]
         },
         "views": {
-            "cobot": [
+            "hobot": [
                 {
                     "id": "checkResult",
                     "name": "检测结果"
+                },
+                {
+                    "id": "moduleBugs",
+                    "name": "组件漏洞（请在检测结果中选择组件以查看漏洞）",
+                    "visibility": "collapsed"
                 }
             ]
         },
@@ -109,59 +117,35 @@
         },
         "colors": [
             {
-                "id": "level.fatal",
-                "description": "严重等级颜色: 致命",
+                "id": "level.high",
+                "description": "漏洞严重等级颜色: 高危",
                 "defaults": {
-                    "dark": "#701212",
-                    "light": "#701212"
+                    "dark": "#C82B33",
+                    "light": "#C82B33"
                 }
             },
             {
-                "id": "level.critical",
-                "description": "严重等级颜色: 严重",
+                "id": "level.mid",
+                "description": "漏洞严重等级颜色: 中危",
                 "defaults": {
-                    "dark": "#c53030",
-                    "light": "#c53030"
+                    "dark": "#FE7178",
+                    "light": "#FE7178"
                 }
             },
             {
-                "id": "level.important",
-                "description": "严重等级颜色: 重要",
+                "id": "level.low",
+                "description": "漏洞严重等级颜色: 低危",
                 "defaults": {
-                    "dark": "#fc5d5d",
-                    "light": "#fc5d5d"
+                    "dark": "#FF989E",
+                    "light": "#FF989E"
                 }
             },
             {
-                "id": "level.minor",
-                "description": "严重等级颜色: 次要",
+                "id": "level.other",
+                "description": "漏洞严重等级颜色: 其他",
                 "defaults": {
-                    "dark": "#ffaa33",
-                    "light": "#ffaa33"
-                }
-            },
-            {
-                "id": "level.hint",
-                "description": "严重等级颜色: 提示",
-                "defaults": {
-                    "dark": "#d5c828",
-                    "light": "#d5c828"
-                }
-            },
-            {
-                "id": "level.required",
-                "description": "严重等级颜色: 强制",
-                "defaults": {
-                    "dark": "#4a90e2",
-                    "light": "#4a90e2"
-                }
-            },
-            {
-                "id": "level.suggestion",
-                "description": "严重等级颜色: 建议",
-                "defaults": {
-                    "dark": "#83d232",
-                    "light": "#83d232"
+                    "dark": "#A89595",
+                    "light": "#A89595"
                 }
             }
         ]
@@ -180,6 +164,7 @@
     "devDependencies": {
         "@types/archiver": "^5.3.2",
         "@types/glob": "^8.1.0",
+        "@types/humanize-duration": "^3.27.1",
         "@types/mocha": "^10.0.1",
         "@types/node": "16.x",
         "@types/tmp": "^0.2.3",
@@ -200,6 +185,7 @@
         "archiver": "^5.3.1",
         "axios": "^1.4.0",
         "form-data": "^4.0.0",
+        "humanize-duration": "^3.28.0",
         "tmp": "^0.2.1",
         "ws": "^8.13.0"
     }

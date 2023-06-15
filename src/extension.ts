@@ -1,8 +1,9 @@
 import * as vscode from 'vscode';
+import { CheckResultTreeDataProvider, CheckResultTreeItem, registerShowDetailsCommand, registerShowMoreModulesCommand } from './CheckResultTreeDataProvider';
 import { getToken } from './ConfigController';
-import path = require('path');
 import { statusVerification } from './Uploader';
-import { CheckResultTreeDataProvider, registerShowDetailsCommand, registerShowMoreCommand } from './CheckResultTreeDataProvider';
+import path = require('path');
+import { ModuleBugsTreeDataProvider, registerShowMoreBugsCommand } from './ModuleBugsTreeDataProvider';
 
 export function activate(context: vscode.ExtensionContext) {
     getToken();
@@ -30,19 +31,29 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     const checkResultProvider = new CheckResultTreeDataProvider();
+    const moduleBugsProvider = new ModuleBugsTreeDataProvider(context);
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('cobot-sast-vscode.checkResult.refresh', () => {
+        vscode.commands.registerCommand('hobot-vscode.checkResult.refresh', () => {
             checkResultProvider.refresh();
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('hobot-vscode.checkResult.showBugs', async ({ label, description, id }: CheckResultTreeItem) => {
+            await moduleBugsProvider.refresh(id);
+            if (moduleBugsProvider.treeView) { moduleBugsProvider.treeView.title = `组件${label}-${description}漏洞`; }
         })
     );
 
     // 注册显示检测历史记录的详细信息命令
     registerShowDetailsCommand(context);
-    registerShowMoreCommand(context, checkResultProvider);
+    registerShowMoreModulesCommand(context, checkResultProvider);
+    registerShowMoreBugsCommand(context, moduleBugsProvider);
 
     // 注册侧边栏
     vscode.window.registerTreeDataProvider('checkResult', checkResultProvider);
+    vscode.window.registerTreeDataProvider('moduleBugs', moduleBugsProvider);
 
 }
 

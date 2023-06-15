@@ -1,23 +1,17 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import * as vscode from 'vscode';
 const levels = [
-    { key: 1, value: "致命" },
-    { key: 2, value: "严重" },
-    { key: 3, value: "重要" },
-    { key: 4, value: "次要" },
-    { key: 5, value: "提示" },
-    { key: 6, value: "强制" },
-    { key: 7, value: "建议" },
+    { key: 1, value: "high" },
+    { key: 2, value: "mid" },
+    { key: 3, value: "low" },
+    { key: 4, value: "other" },
 ];
 
 const levelColor: Record<string, string> = {
-    致命: "level.fatal",
-    严重: "level.critical",
-    重要: "level.important",
-    次要: "level.minor",
-    提示: "level.hint",
-    强制: "level.required",
-    建议: "level.suggestion",
+    high: "level.high",
+    mid: "level.mid",
+    low: "level.low",
+    other: "level.other",
 };
 
 export const getLevelColor = (level: string) => {
@@ -25,33 +19,24 @@ export const getLevelColor = (level: string) => {
 };
 
 const colorList = [
-    "#701212",
-    "#c53030",
-    "#fc5d5d",
-    "#ffaa33",
-    "#d5c828",
-    "#4a90e2",
-    "#83d232",
+    "#C82B33",
+    "#FE7178",
+    "#FF989E",
+    "#A89595",
 ];
 
 const numberLevel = {
-    1: "致命",
-    2: "严重",
-    3: "重要",
-    4: "次要",
-    5: "提示",
-    6: "强制",
-    7: "建议",
+    1: "高危",
+    2: "中危",
+    3: "低危",
+    4: "其他",
 };
 
 const numberColor = {
-    1: "#701212",
-    2: "#c53030",
-    3: "#fc5d5d",
-    4: "#ffaa33",
-    5: "#d5c828",
-    6: "#4a90e2",
-    7: "#83d232",
+    1: "#C82B33",
+    2: "#FE7178",
+    3: "#FF989E",
+    4: "#A89595",
 };
 
 export { levels, levelColor, colorList, numberLevel, numberColor };

@@ -10,7 +10,7 @@ import { WebSocket } from 'ws';
 
 
 
-export const uploadAndCheckProject = async (fileStream: fs.ReadStream, projectName: string) => {
+export const uploadAndCheckProject = async (fileStream: fs.ReadStream, projectName: string): Promise<any> => {
     try {
         const { serviceUrl, token } = getToken();
         if (serviceUrl && token) {
@@ -45,6 +45,7 @@ export const uploadAndCheckProject = async (fileStream: fs.ReadStream, projectNa
                 });
                 vscode.window.showInformationMessage(response.data.msg);
                 console.log('请求成功:', response);
+                return response.data.data;
             });
         }
     } catch (error) {
@@ -107,50 +108,54 @@ export const onlyCheckProject = async (projectId: string) => {
     vscode.window.showInformationMessage(res.data.msg);
 };
 
-export const showCheckProgress = (projectName: string, projectId: string | undefined = undefined, analysisRate: number = -3) => {
+export const showCheckProgress = (projectName: string, projectId: string, analysisRate: number = -3) => {
     const { serviceUrl, token } = getToken();
     vscode.window.withProgress({
         location: vscode.ProgressLocation.Notification,
         title: `项目${projectName}`,
     }, (progress) => {
         return new Promise<void>(async (resolve, reject) => {
-            console.log(`${serviceUrl?.replace(/^http/, 'ws')}/hobot/websocket/${projectId}`);
-            const ws = new WebSocket(`${serviceUrl?.replace(/^http/, 'ws')}/hobot/websocket/project/${projectId}`, {
-                timeout: 1000,
-            });
-            const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
-            ws.onopen = e => {
-                progress.report({ message: `等待检测`, increment: analysisRate === -3 ? 0 : analysisRate });
-                statusBar.show();
-                statusBar.text = `${projectName}：开始检测`;
-            };
-            let lastRate = analysisRate === -3 ? 0 : analysisRate;
-            ws.onmessage = (event: any) => {
-                console.log(event);
-                if (event.data.startsWith(`rate`)) {
-                    const rate = Number(event.data.split(`:`)[1]);
-                    const increment = rate - lastRate;
-                    lastRate = rate;
-                    progress.report({ message: `检测中，进度${rate}%`, increment: increment });
-                    statusBar.text = `${projectName}：$(sync~spin)检测中${rate}%`;
-                    if (rate === 100) {
-                        progress.report({ message: `检测完成！`, increment: increment });
-                        vscode.window.showInformationMessage(`${projectName}检测完成！`);
-                        statusBar.text = `${projectName}：检测完成`;
-                        vscode.commands.executeCommand('hobot-vscode.checkResult.refresh');
-                        resolve();
+            console.log(`${serviceUrl?.replace(/^http/, 'ws')}/hobot/websocket/project${projectId}`);
+            try {
+                const ws = new WebSocket(`${serviceUrl?.replace(/^http/, 'ws')}/hobot/websocket/project${projectId}`, {
+                    timeout: 1000,
+                });
+                const statusBar = vscode.window.createStatusBarItem(vscode.StatusBarAlignment.Left);
+                ws.onopen = e => {
+                    progress.report({ message: `等待检测`, increment: analysisRate === -3 ? 0 : analysisRate });
+                    statusBar.show();
+                    statusBar.text = `${projectName}：开始检测`;
+                };
+                let lastRate = analysisRate === -3 ? 0 : analysisRate;
+                ws.onmessage = (event: any) => {
+                    const message = JSON.parse(event.data);
+                    const rate = JSON.parse(message[projectId]).process;
+                    if (rate) {
+                        const increment = rate - lastRate;
+                        lastRate = rate;
+                        progress.report({ message: `检测中，进度${rate}%`, increment: increment });
+                        statusBar.text = `${projectName}：$(sync~spin)检测中${rate}%`;
+                        if (rate === '100') {
+                            progress.report({ message: `检测完成！`, increment: increment });
+                            vscode.window.showInformationMessage(`${projectName}检测完成！`);
+                            statusBar.text = `${projectName}：检测完成`;
+                            vscode.commands.executeCommand('hobot-vscode.checkResult.refresh');
+                            resolve();
+                        }
                     }
-                }
-            };
-            ws.onclose = (e) => {
-                console.log('关闭:', e.reason);
-                if (statusBar.text !== `${projectName}：检测完成`) {
-                    statusBar.text !== `${projectName}：检测出错$(error)`;
-                } else {
-                    statusBar.dispose();
-                }
-                reject(e);
-            };
+                };
+                ws.onclose = (e) => {
+                    console.log('关闭:', e.reason);
+                    if (statusBar.text !== `${projectName}：检测完成`) {
+                        statusBar.text !== `${projectName}：检测出错$(error)`;
+                    } else {
+                        statusBar.dispose();
+                    }
+                    reject(e);
+                };
+            } catch (error) {
+                console.log(error);
+            }
         });
     });
 };
@@ -213,8 +218,10 @@ export const statusVerification = async () => {
             }
         } else {
             const fileStream = await compressFolderInTemp(projectPath);
-            fileStream && await uploadAndCheckProject(fileStream, projectName);
-            showCheckProgress(projectName);
+            if (fileStream) {
+                const projectId = await uploadAndCheckProject(fileStream, projectName);
+                projectId && showCheckProgress(projectName, projectId);
+            }
         }
     }
 };
