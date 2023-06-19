@@ -8,12 +8,13 @@ import { getCheckStatusName } from './Utils';
 import FormData = require('form-data');
 import { WebSocket } from 'ws';
 
-export const uploadAndCheckProject = async (fileStream: fs.ReadStream, projectName: string): Promise<any> => {
+export const uploadAndCheckProject = async (fileStream: string, projectName: string): Promise<any> => {
     try {
         const { serviceUrl, token } = getToken();
         if (serviceUrl && token) {
             const formData = new FormData();
-            formData.append('file', fileStream, { filename: `${projectName}.zip` });
+            const tmpfileStream = fs.createReadStream(fileStream);
+            formData.append('file', tmpfileStream, { filename: `${projectName}.zip` });
             formData.append('projectName', projectName);
             formData.append('projectVersion', 'vscode');
             let previousLoaded = 0; // 用于保存上一次进度事件的 loaded 值
@@ -53,14 +54,15 @@ export const uploadAndCheckProject = async (fileStream: fs.ReadStream, projectNa
     }
 };
 
-export const updateProject = async (fileStream: fs.ReadStream, projectName: string, projectId: string) => {
+export const updateProject = async (fileStream: string, projectName: string, projectId: string) => {
     try {
         const { serviceUrl, token } = getToken();
         if (serviceUrl && token) {
             const formData = new FormData();
             formData.append('projectId', projectId);
             formData.append('importType', 'file');
-            formData.append('file', fileStream, { filename: `${projectName}.zip` });
+            const tmpfileStream = fs.createReadStream(fileStream);
+            formData.append('file', tmpfileStream, { filename: `${projectName}.zip` });
             let previousLoaded = 0; // 用于保存上一次进度事件的 loaded 值
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
@@ -186,8 +188,9 @@ export const statusVerification = async () => {
                     ignoreFocusOut: true,
                 });
                 if (reCheck?.label === '重新上传') {
-                    const fileStream = await compressFolderInTemp(projectPath);
-                    fileStream && await updateProject(fileStream, projectName, projectId);
+                    const  [tmpZipPath, cleanupCallback]  = await compressFolderInTemp(projectPath);
+                    tmpZipPath && await updateProject(tmpZipPath, projectName, projectId);
+                    cleanupCallback();
                     onlyCheckProject(projectId);
                     showCheckProgress(projectName, projectId, analysisRate);
                     return;
@@ -210,16 +213,18 @@ export const statusVerification = async () => {
                     ignoreFocusOut: true,
                 });
                 if (reUpload?.label === '是') {
-                    const fileStream = await compressFolderInTemp(projectPath);
-                    fileStream && await updateProject(fileStream, projectName, projectId);
+                    const [tmpZipPath, cleanupCallback] = await compressFolderInTemp(projectPath);
+                    tmpZipPath && await updateProject(tmpZipPath, projectName, projectId);
+                    cleanupCallback()
                 }
                 onlyCheckProject(projectId);
                 showCheckProgress(projectName, projectId, analysisRate);
             }
         } else {
-            const fileStream = await compressFolderInTemp(projectPath);
-            if (fileStream) {
-                const projectId = await uploadAndCheckProject(fileStream, projectName);
+            const [tmpZipPath, cleanupCallback] = await compressFolderInTemp(projectPath);
+            if (tmpZipPath) {
+                const projectId = await uploadAndCheckProject(tmpZipPath, projectName);
+                cleanupCallback();
                 showCheckProgress(projectName, projectId);
             }
         }

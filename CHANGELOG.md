@@ -1,9 +1,17 @@
-# Change Log
+# 发布日志
 
-All notable changes to the "hobot-vscode" extension will be documented in this file.
+对 “**hobot-vscode**” 扩展的所有重要更新都将记录在此文件中。
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [未发布]
 
-## [Unreleased]
+* 无
 
-- Initial release
+## [0.0.1]
+
+* 完成项目的搭建
+* 实现了用户token绑定、项目上传、项目检测、项目结果展示定位等功能
+* 编写了readme并制定了后续开发的任务计划
+
+## [0.0.2]
+
+* 解决fs.ReadStream操作冲突导致在MacOS 13.4下无法正确上传文件的问题
