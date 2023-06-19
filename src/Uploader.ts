@@ -8,8 +8,6 @@ import { getCheckStatusName } from './Utils';
 import FormData = require('form-data');
 import { WebSocket } from 'ws';
 
-
-
 export const uploadAndCheckProject = async (fileStream: fs.ReadStream, projectName: string): Promise<any> => {
     try {
         const { serviceUrl, token } = getToken();
@@ -19,6 +17,7 @@ export const uploadAndCheckProject = async (fileStream: fs.ReadStream, projectNa
             formData.append('projectName', projectName);
             formData.append('projectVersion', 'vscode');
             let previousLoaded = 0; // 用于保存上一次进度事件的 loaded 值
+            let projectId = undefined;
             await vscode.window.withProgress({
                 location: vscode.ProgressLocation.Notification,
                 title: `${projectName}正在上传`,
@@ -44,9 +43,10 @@ export const uploadAndCheckProject = async (fileStream: fs.ReadStream, projectNa
                     },
                 });
                 vscode.window.showInformationMessage(response.data.msg);
-                console.log('请求成功:', response);
-                return response.data.data;
+                console.log('请求成功:', response.data.data);
+                projectId = await response.data.data;
             });
+            return projectId;
         }
     } catch (error) {
         console.error('请求失败:', error);
@@ -220,7 +220,7 @@ export const statusVerification = async () => {
             const fileStream = await compressFolderInTemp(projectPath);
             if (fileStream) {
                 const projectId = await uploadAndCheckProject(fileStream, projectName);
-                projectId && showCheckProgress(projectName, projectId);
+                showCheckProgress(projectName, projectId);
             }
         }
     }
