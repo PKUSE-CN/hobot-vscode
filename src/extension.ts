@@ -9,13 +9,10 @@ export function activate(context: vscode.ExtensionContext) {
     getToken();
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('hobot-vscode.checkResult.checkProject', async (uri) => {
+        vscode.commands.registerCommand('hobot-vscode.checkResult.checkFolder', async (uri) => {
             if (uri && uri.fsPath) {
                 const folderPath = uri.fsPath;
                 const folderName = path.basename(folderPath);
-                // TODO 检测文件所属工作空间（不清楚需不需要判断）
-                console.log(vscode.workspace.getWorkspaceFolder(vscode.Uri.file(folderPath))?.uri.fsPath);
-                // const folderName = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(folderPath))?.name;
 
                 if (folderPath && folderName) {
                     const config = vscode.workspace.getConfiguration('hobot-vscode');
@@ -26,6 +23,32 @@ export function activate(context: vscode.ExtensionContext) {
                 else {
                     vscode.window.showErrorMessage(`文件夹${folderName}路径或名称获取异常，路径为:${folderPath}，请重试`);
                 }
+            } else {
+                vscode.window.showErrorMessage(`当前菜单路径获取异常，请选中项目中任意文件夹操作`);
+            }
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('hobot-vscode.checkResult.checkWorkSpaceProject', async (uri) => {
+            if (uri && uri.fsPath) {
+                const folderPath = uri.fsPath;
+                const workspace = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(folderPath));
+                const workspacePath = workspace?.uri.fsPath;
+                const folderName = workspace?.name;
+                console.log(workspacePath, folderName);
+
+                if (workspacePath && folderName) {
+                    const config = vscode.workspace.getConfiguration('hobot-vscode');
+                    await config.update('projectName', folderName);
+                    await config.update('projectPath', workspacePath);
+                    statusVerification();
+                }
+                else {
+                    vscode.window.showErrorMessage(`文件夹${folderName}路径或名称获取异常，路径为:${workspacePath}，请重试`);
+                }
+            } else {
+                vscode.window.showErrorMessage(`当前菜单路径获取异常，请选中项目中任意文件操作`);
             }
         })
     );

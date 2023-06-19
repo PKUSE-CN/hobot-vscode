@@ -1,16 +1,18 @@
 {
     "name": "hobot-vscode",
-    "displayName": "hobot-vscode",
-    "description": "库博软件成分分析与同源漏洞检测工具软件",
+    "displayName": "库博软件成分分析与同源漏洞检测插件",
+    "description": "库博软件成分分析及漏洞检测工具系统（又名COBOT-SCA）是由北京北大软件工程股份有限公司自主研发的一款用于检测C/C++/Java等100余种语言的源代码成分分析及漏洞检测平台。库博庞大的知识库以及智能代码分析算法，可以精准地分析出被测程序包含的组件信息，第一时间发现潜藏在程序中的安全漏洞，并为用户提出可靠的补救措施。",
     "version": "0.0.1",
-    "publisher": "ghostlhq",
+    "publisher": "PKUSE",
     "engines": {
         "vscode": "^1.78.0"
     },
     "categories": [
         "Other"
     ],
-    "activationEvents": [],
+    "activationEvents": [
+        "onView:*"
+    ],
     "main": "./dist/extension.js",
     "icon": "images/logo-cobot.png",
     "repository": {
@@ -21,7 +23,7 @@
         "commands": [
             {
                 "command": "hobot-vscode.checkResult.refresh",
-                "category": "库博软件成分分析与同源漏洞检测工具软件",
+                "category": "库博软件成分分析与同源漏洞检测工具",
                 "title": "刷新检测结果",
                 "icon": "$(refresh)"
             },
@@ -41,15 +43,19 @@
                 "icon": "$(list-flat)"
             },
             {
-                "command": "hobot-vscode.checkResult.checkProject",
-                "title": "hobot: 检测项目"
+                "command": "hobot-vscode.checkResult.checkFolder",
+                "title": "hobot: 检测当前文件夹"
+            },
+            {
+                "command": "hobot-vscode.checkResult.checkWorkSpaceProject",
+                "title": "hobot: 检测当前工作空间项目"
             }
         ],
         "viewsContainers": {
             "activitybar": [
                 {
                     "id": "hobot",
-                    "title": "库博软件成分分析与同源漏洞检测工具软件",
+                    "title": "库博软件成分分析与同源漏洞检测工具",
                     "icon": "images/cobot_logo_svg.svg"
                 }
             ]
@@ -71,9 +77,13 @@
             ],
             "explorer/context": [
                 {
-                    "command": "hobot-vscode.checkResult.checkProject",
+                    "command": "hobot-vscode.checkResult.checkFolder",
                     "group": "menu",
                     "when": "explorerResourceIsFolder"
+                },
+                {
+                    "command": "hobot-vscode.checkResult.checkWorkSpaceProject",
+                    "group": "menu"
                 }
             ]
         },
@@ -81,7 +91,7 @@
             "hobot": [
                 {
                     "id": "checkResult",
-                    "name": "检测结果"
+                    "name": "包含组件"
                 },
                 {
                     "id": "moduleBugs",
@@ -91,17 +101,18 @@
             ]
         },
         "configuration": {
-            "title": "库博软件成分分析与同源漏洞检测工具软件",
+            "title": "库博软件成分分析与同源漏洞检测工具",
             "properties": {
                 "hobot-vscode.url": {
                     "type": "string",
                     "default": "",
-                    "description": "库博软件成分分析与同源漏洞检测工具软件服务端地址"
+                    "format": "uri",
+                    "description": "库博软件成分分析与同源漏洞检测工具服务端地址"
                 },
                 "hobot-vscode.token": {
                     "type": "string",
                     "default": "",
-                    "description": "库博软件成分分析与同源漏洞检测工具软件密钥"
+                    "description": "库博软件成分分析与同源漏洞检测工具密钥"
                 },
                 "hobot-vscode.projectName": {
                     "type": "string",
@@ -184,9 +195,11 @@
     "dependencies": {
         "archiver": "^5.3.1",
         "axios": "^1.4.0",
+        "bufferutil": "^4.0.7",
         "form-data": "^4.0.0",
         "humanize-duration": "^3.28.0",
         "tmp": "^0.2.1",
+        "utf-8-validate": "^6.0.3",
         "ws": "^8.13.0"
     }
 }

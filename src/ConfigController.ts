@@ -31,18 +31,25 @@ export const getProjectId = async () => {
     const config = vscode.workspace.getConfiguration('hobot-vscode');
     const projectName = config.get<string>('projectName');
     const { serviceUrl, token } = getToken();
-    const repoRes = await axios.get(`${serviceUrl}/hobot/openApi/findProject`, {
-        params: {
-            projectName,
-            projectVersion: 'vscode'
-        },
-        headers: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            Authorization: token,
+    try {
+        const repoRes = await axios.get(`${serviceUrl}/hobot/openApi/findProject`, {
+            params: {
+                projectName,
+                projectVersion: 'vscode'
+            },
+            headers: {
+                // eslint-disable-next-line @typescript-eslint/naming-convention
+                Authorization: token,
+            }
+        });
+        if (!repoRes.data.data?.projectId) {
+            vscode.window.showErrorMessage(repoRes.data.data);
         }
-    });
-    const { projectId } = repoRes.data.data;
-    return projectId;
+        return repoRes.data.data?.projectId;
+    } catch (error) {
+        vscode.window.showErrorMessage('获取项目Id出错');
+        console.error(error);
+    }
 };
 
 export const getProjectPath = () => {
