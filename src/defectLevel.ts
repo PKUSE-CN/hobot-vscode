@@ -9,7 +9,7 @@ const levels = [
 
 const levelColor: Record<string, string> = {
     high: "level.high",
-    mid: "level.mid",
+    middle: "level.mid",
     low: "level.low",
     other: "level.other",
 };

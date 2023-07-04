@@ -63,9 +63,9 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('hobot-vscode.checkResult.showBugs', async ({ label, description, id }: CheckResultTreeItem) => {
+        vscode.commands.registerCommand('hobot-vscode.checkResult.showBugs', async ({ originData, id }: CheckResultTreeItem) => {
             await moduleBugsProvider.refresh(id);
-            if (moduleBugsProvider.treeView) { moduleBugsProvider.treeView.title = `组件${label}-${description}漏洞`; }
+            if (moduleBugsProvider.treeView) { moduleBugsProvider.treeView.title = `组件${originData.module_name}-${originData.module_version}·包含漏洞 ${originData.module_bugcount}`; }
         })
     );
 

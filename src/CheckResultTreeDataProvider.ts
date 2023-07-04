@@ -43,6 +43,8 @@ export class CheckResultTreeItem extends vscode.TreeItem {
             tooltip.supportThemeIcons = true;
             tooltip.appendMarkdown(`**${this.originData.module_name}**: ${this.originData.module_version}\n\n`);
             tooltip.appendMarkdown(`**组件来源**: [${this.originData.module_origin}](${this.originData.module_url})\n\n`);
+            tooltip.appendMarkdown(`**匹配类型**: ${this.originData.module_match_type}\n\n`);
+            tooltip.appendMarkdown(`**匹配文件**: ${this.originData.module_match}\n\n`);
             tooltip.appendMarkdown(`**已知漏洞**: ${this.originData.module_bugcount}\n\n`);
             this.originData.bug_high && tooltip.appendMarkdown(`**🔴 高危漏洞**: ${this.originData.bug_high}\n\n`);
             this.originData.bug_middle && tooltip.appendMarkdown(`**🟠 中危漏洞**: ${this.originData.bug_middle}\n\n`);
@@ -92,7 +94,7 @@ class FileTreeItem extends vscode.TreeItem {
         public readonly fileid: string,
     ) {
         super(name);
-        this.label = this.type === 'file' ? `${this.name} · ${this.matchType}` : this.name;
+        this.label = this.name;
         this.description = this.path && `${getProjectName()} · ${this.path}`;
         this.collapsibleState = this.children?.length ? 2 : 0;
         if (this.type === 'file') {
@@ -146,13 +148,13 @@ export class CheckResultTreeDataProvider implements vscode.TreeDataProvider<vsco
                 });
                 if (res.data.data.totalSize) { this.total = res.data.data.totalSize; }
                 if (this.pageNum === 0) {
-                    this.modules = res.data.data?.dataContent?.map((x: any) => new CheckResultTreeItem(x.module_id, x.module_name, x.module_version, 1, x)) || [];
+                    this.modules = res.data.data?.dataContent?.map((x: any) => new CheckResultTreeItem(x.module_id, x.module_name, `${x.module_version} · ${x.module_match_type} ${x.module_match}`, 1, x)) || [];
                     if (this.modules.length >= this.total || this.modules.length === 0) {
                         this.hasMore = false;
                         vscode.window.showInformationMessage('所有组件已获取完成！');
                     }
                 } else {
-                    const rest = res.data.data?.dataContent?.map((x: any) => new CheckResultTreeItem(x.module_id, x.module_name, x.module_version, 1, x)) || [];
+                    const rest = res.data.data?.dataContent?.map((x: any) => new CheckResultTreeItem(x.module_id, x.module_name, `${x.module_version} · ${x.module_match_type} ${x.module_match}`, 1, x)) || [];
                     this.modules.pop();
                     this.modules = this.modules.concat(rest);
                     vscode.window.showInformationMessage(`获取更多，当前${this.modules.length}/${this.total}`);
@@ -221,12 +223,25 @@ export function registerShowDetailsCommand(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.commands.registerCommand('checkResult.showDetails', async ({ fileid, name, description, matchType, path }: FileTreeItem) => {
 
-            if (matchType === '部分匹配') {
-                matchDiff(path, fileid);
+            if (matchType === '部分匹配' || matchType === '完全匹配') {
+                const res = await matchDiff(path, fileid);
+                if (res) {
+                    const [remoteUrl, buttonPath] = res;
+                    if (remoteUrl && buttonPath) {
+                        vscode.window.showInformationMessage(`${name}\n${description}`, `打开远端${buttonPath}`).then((action) => {
+                            if (action === `打开远端${buttonPath}`) {
+                                vscode.env.openExternal(vscode.Uri.parse(remoteUrl));
+                            }
+                        });
+                    } else {
+                        vscode.window.showInformationMessage(`${name}\n${description}`);
+                    }
+                }
+
             } else {
                 openFile(path);
+                vscode.window.showInformationMessage(`${name}\n${description}`);
             }
-            vscode.window.showInformationMessage(`${name}\n${description}`);
         })
     );
 }
@@ -269,6 +284,7 @@ async function matchDiff(filePath: string, fileId: string) {
                     vscode.commands.executeCommand('vscode.diff', serverFileUri, localUri, `远端 ⟷ 本地: ${filename}`);
                 });
             });
+            return [res.data.data.gitUrl, res.data.data.projectRelativePath];
         } catch (error) {
             console.error(error);
             vscode.window.showErrorMessage(`${normalizedPath}打开失败: ${error}`);
