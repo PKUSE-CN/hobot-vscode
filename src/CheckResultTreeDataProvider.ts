@@ -121,6 +121,14 @@ export class CheckResultTreeDataProvider implements vscode.TreeDataProvider<vsco
     private pageSize = 100;
     private total = 0;
     private fileName = '';
+    public treeView: vscode.TreeView<vscode.TreeItem> | undefined = undefined;
+
+    constructor(context: vscode.ExtensionContext) {
+        this.treeView = vscode.window.createTreeView('checkResult', {
+            treeDataProvider: this
+        });
+        context.subscriptions.push(this.treeView);
+    }
 
     // 获取树形结构的根节点
     getTreeItem(element: vscode.TreeItem): vscode.TreeItem {
@@ -180,6 +188,7 @@ export class CheckResultTreeDataProvider implements vscode.TreeDataProvider<vsco
         if (!element) {
             // 根节点：返回最近的检测问题和 showMore 命令占位符
             await this.getModules();
+            await vscode.commands.executeCommand('hobot-vscode.checkResult.updateTitle');
             if (this.hasMore) {
                 this.modules.push(showMorePlaceholder);
             }

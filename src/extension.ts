@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { CheckResultTreeDataProvider, CheckResultTreeItem, registerShowDetailsCommand, registerShowMoreModulesCommand } from './CheckResultTreeDataProvider';
-import { getToken } from './ConfigController';
+import { getProjectName, getToken } from './ConfigController';
 import { statusVerification } from './Uploader';
 import path = require('path');
 import { ModuleBugsTreeDataProvider, registerShowMoreBugsCommand } from './ModuleBugsTreeDataProvider';
@@ -53,12 +53,21 @@ export function activate(context: vscode.ExtensionContext) {
         })
     );
 
-    const checkResultProvider = new CheckResultTreeDataProvider();
+    const checkResultProvider = new CheckResultTreeDataProvider(context);
     const moduleBugsProvider = new ModuleBugsTreeDataProvider(context);
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('hobot-vscode.checkResult.refresh', () => {
-            checkResultProvider.refresh();
+        vscode.commands.registerCommand('hobot-vscode.checkResult.refresh', async () => {
+            await checkResultProvider.refresh();
+            vscode.commands.executeCommand(`hobot-vscode.checkResult.updateTitle`);
+
+        })
+    );
+
+    context.subscriptions.push(
+        vscode.commands.registerCommand('hobot-vscode.checkResult.updateTitle', async () => {
+            const name = getProjectName();
+            if (checkResultProvider.treeView && name) { checkResultProvider.treeView.title = `项目${name} · 包含组件`; }
         })
     );
 
