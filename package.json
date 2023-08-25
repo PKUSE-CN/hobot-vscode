@@ -2,7 +2,7 @@
     "name": "hobot-vscode",
     "displayName": "库博软件成分分析与同源漏洞检测插件",
     "description": "库博软件成分分析及漏洞检测工具系统（又名COBOT-SCA）是由北京北大软件工程股份有限公司自主研发的一款用于检测C/C++/Java等100余种语言的源代码成分分析及漏洞检测平台。库博庞大的知识库以及智能代码分析算法，可以精准地分析出被测程序包含的组件信息，第一时间发现潜藏在程序中的安全漏洞，并为用户提出可靠的补救措施。",
-    "version": "0.0.5",
+    "version": "0.0.6",
     "publisher": "PKUSE",
     "engines": {
         "vscode": "^1.64.2"
@@ -17,7 +17,7 @@
     "icon": "images/logo-cobot.png",
     "repository": {
         "type": "git",
-        "url": "https://github.com/PKUSE-CN/hobot-vscode"
+        "url": "https://gitee.com/PKUSE-CN/hobot-vscode"
     },
     "contributes": {
         "commands": [
