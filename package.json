@@ -14,7 +14,7 @@
         "onView:*"
     ],
     "main": "./dist/extension.js",
-    "icon": "images/logo-cobot.png",
+    "icon": "images/logo-hobot.png",
     "repository": {
         "type": "git",
         "url": "https://gitee.com/PKUSE-CN/hobot-vscode"
@@ -56,7 +56,7 @@
                 {
                     "id": "hobot",
                     "title": "库博软件成分分析与同源漏洞检测工具",
-                    "icon": "images/cobot_logo_svg.svg"
+                    "icon": "images/logo-hobot-pure.png"
                 }
             ]
         },
