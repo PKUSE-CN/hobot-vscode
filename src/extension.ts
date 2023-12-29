@@ -9,7 +9,7 @@ export function activate(context: vscode.ExtensionContext) {
     getToken();
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('hobot-vscode.checkResult.checkFolder', async (uri) => {
+        vscode.commands.registerCommand('hobot-vscode.hobot-checkResult.checkFolder', async (uri) => {
             if (uri && uri.fsPath) {
                 const folderPath = uri.fsPath;
                 const folderName = path.basename(folderPath);
@@ -30,13 +30,13 @@ export function activate(context: vscode.ExtensionContext) {
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('hobot-vscode.checkResult.checkWorkSpaceProject', async (uri) => {
+        vscode.commands.registerCommand('hobot-vscode.hobot-checkResult.checkWorkSpaceProject', async (uri) => {
             if (uri && uri.fsPath) {
                 const folderPath = uri.fsPath;
                 const workspace = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(folderPath));
                 const workspacePath = workspace?.uri.fsPath;
                 const folderName = workspace?.name;
-                console.log(workspacePath, folderName);
+                // console.log(workspacePath, folderName);
 
                 if (workspacePath && folderName) {
                     const config = vscode.workspace.getConfiguration('hobot-vscode');
@@ -57,22 +57,22 @@ export function activate(context: vscode.ExtensionContext) {
     const moduleBugsProvider = new ModuleBugsTreeDataProvider(context);
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('hobot-vscode.checkResult.refresh', async () => {
+        vscode.commands.registerCommand('hobot-vscode.hobot-checkResult.refresh', async () => {
             await checkResultProvider.refresh();
-            vscode.commands.executeCommand(`hobot-vscode.checkResult.updateTitle`);
+            vscode.commands.executeCommand(`hobot-vscode.hobot-checkResult.updateTitle`);
 
         })
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('hobot-vscode.checkResult.updateTitle', async () => {
+        vscode.commands.registerCommand('hobot-vscode.hobot-checkResult.updateTitle', async () => {
             const name = getProjectName();
             if (checkResultProvider.treeView && name) { checkResultProvider.treeView.title = `项目${name} · 包含组件`; }
         })
     );
 
     context.subscriptions.push(
-        vscode.commands.registerCommand('hobot-vscode.checkResult.showBugs', async ({ originData, id }: CheckResultTreeItem) => {
+        vscode.commands.registerCommand('hobot-vscode.hobot-checkResult.showBugs', async ({ originData, id }: CheckResultTreeItem) => {
             await moduleBugsProvider.refresh(id);
             if (moduleBugsProvider.treeView) { moduleBugsProvider.treeView.title = `组件${originData.module_name}-${originData.module_version}·包含漏洞 ${originData.module_bugcount}`; }
         })
@@ -84,7 +84,7 @@ export function activate(context: vscode.ExtensionContext) {
     registerShowMoreBugsCommand(context, moduleBugsProvider);
 
     // 注册侧边栏
-    vscode.window.registerTreeDataProvider('checkResult', checkResultProvider);
+    vscode.window.registerTreeDataProvider('hobot-checkResult', checkResultProvider);
     vscode.window.registerTreeDataProvider('moduleBugs', moduleBugsProvider);
 
 }

@@ -44,7 +44,7 @@ export const uploadAndCheckProject = async (fileStream: string, projectName: str
                     },
                 });
                 vscode.window.showInformationMessage(response.data.msg);
-                console.log('请求成功:', response.data.data);
+                // console.log('请求成功:', response.data.data);
                 projectId = await response.data.data;
             });
             return projectId;
@@ -88,7 +88,7 @@ export const updateProject = async (fileStream: string, projectName: string, pro
                     },
                 });
                 vscode.window.showInformationMessage(response.data.msg);
-                console.log('请求成功:', response);
+                // console.log('请求成功:', response);
             });
         }
     } catch (error) {
@@ -117,7 +117,7 @@ export const showCheckProgress = (projectName: string, projectId: string, analys
         title: `项目${projectName}`,
     }, (progress) => {
         return new Promise<void>(async (resolve, reject) => {
-            console.log(`${serviceUrl?.replace(/^http/, 'ws')}/hobot/websocket/project${projectId}`);
+            // console.log(`${serviceUrl?.replace(/^http/, 'ws')}/hobot/websocket/project${projectId}`);
             try {
                 const ws = new WebSocket(`${serviceUrl?.replace(/^http/, 'ws')}/hobot/websocket/project${projectId}`, {
                     timeout: 1000,
@@ -141,13 +141,13 @@ export const showCheckProgress = (projectName: string, projectId: string, analys
                             progress.report({ message: `检测完成！`, increment: increment });
                             vscode.window.showInformationMessage(`${projectName}检测完成！`);
                             statusBar.text = `${projectName}：检测完成`;
-                            vscode.commands.executeCommand('hobot-vscode.checkResult.refresh');
+                            vscode.commands.executeCommand('hobot-vscode.hobot-checkResult.refresh');
                             resolve();
                         }
                     }
                 };
                 ws.onclose = (e) => {
-                    console.log('关闭:', e.reason);
+                    console.error('关闭:', e.reason);
                     if (statusBar.text !== `${projectName}：检测完成`) {
                         statusBar.text !== `${projectName}：检测出错$(error)`;
                     } else {
@@ -156,7 +156,7 @@ export const showCheckProgress = (projectName: string, projectId: string, analys
                     reject(e);
                 };
             } catch (error) {
-                console.log(error);
+                console.error(error);
             }
         });
     });
@@ -199,7 +199,7 @@ export const statusVerification = async () => {
                     showCheckProgress(projectName, projectId, analysisRate);
                     return;
                 } else {
-                    vscode.commands.executeCommand('hobot-vscode.checkResult.refresh');
+                    vscode.commands.executeCommand('hobot-vscode.hobot-checkResult.refresh');
                     return;
                 }
             } else if (analysisRate >= 0 || analysisRate < 100 || analysisRate === -3) {

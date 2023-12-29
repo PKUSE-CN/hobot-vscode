@@ -52,7 +52,7 @@ export class BugTreeItem extends vscode.TreeItem {
         if (this.id === 'showMore') {
             this.command = {
                 title: '获取更多',
-                command: 'hobot.checkResult.showMoreBugs',
+                command: 'hobot.hobot-checkResult.showMoreBugs',
                 arguments: [this],
             };
         }
@@ -62,7 +62,7 @@ const showMorePlaceholder = new BugTreeItem('showMoreBugs', '获取更多...');
 
 export function registerShowMoreBugsCommand(context: vscode.ExtensionContext, provider: ModuleBugsTreeDataProvider) {
     context.subscriptions.push(
-        vscode.commands.registerCommand('hobot.checkResult.showMoreBugs', async () => {
+        vscode.commands.registerCommand('hobot.hobot-checkResult.showMoreBugs', async () => {
             try {
                 await provider.showMore();
             } catch (error) {

@@ -34,7 +34,7 @@ export const compressFolderInTemp = async (folderPath: string): Promise<any> => 
                 output.on('finish', () => {
                     const buffer = fs.readFileSync(tmpFilePath);
                     // const fileStream = fs.createReadStream(tmpFilePath);
-                    console.log(tmpFilePath);
+                    // console.log(tmpFilePath);
                     console.log(`压缩后大小：${formatSize(buffer.length)}`);
                     resolve([tmpFilePath, cleanupCallback]);
                     // cleanupCallback();

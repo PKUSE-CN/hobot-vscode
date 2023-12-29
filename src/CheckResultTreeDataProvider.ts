@@ -76,7 +76,7 @@ export class CheckResultTreeItem extends vscode.TreeItem {
         if (this.id === 'showMore') {
             this.command = {
                 title: '获取更多',
-                command: 'hobot.checkResult.showMoreModules',
+                command: 'hobot.hobot-checkResult.showMoreModules',
                 arguments: [this],
             };
         }
@@ -100,7 +100,7 @@ class FileTreeItem extends vscode.TreeItem {
         if (this.type === 'file') {
             this.command = {
                 title: '展示详情',
-                command: 'checkResult.showDetails',
+                command: 'hobot-checkResult.showDetails',
                 arguments: [this],
             };
         }
@@ -124,7 +124,7 @@ export class CheckResultTreeDataProvider implements vscode.TreeDataProvider<vsco
     public treeView: vscode.TreeView<vscode.TreeItem> | undefined = undefined;
 
     constructor(context: vscode.ExtensionContext) {
-        this.treeView = vscode.window.createTreeView('checkResult', {
+        this.treeView = vscode.window.createTreeView('hobot-checkResult', {
             treeDataProvider: this
         });
         context.subscriptions.push(this.treeView);
@@ -180,7 +180,7 @@ export class CheckResultTreeDataProvider implements vscode.TreeDataProvider<vsco
         } catch (error) {
             console.error(error);
         }
-        await vscode.commands.executeCommand('checkResult.focus');
+        await vscode.commands.executeCommand('hobot-checkResult.focus');
     }
 
     // 获取树形结构的子节点
@@ -188,7 +188,7 @@ export class CheckResultTreeDataProvider implements vscode.TreeDataProvider<vsco
         if (!element) {
             // 根节点：返回最近的检测问题和 showMore 命令占位符
             await this.getModules();
-            await vscode.commands.executeCommand('hobot-vscode.checkResult.updateTitle');
+            await vscode.commands.executeCommand('hobot-vscode.hobot-checkResult.updateTitle');
             if (this.hasMore) {
                 this.modules.push(showMorePlaceholder);
             }
@@ -230,7 +230,7 @@ export class CheckResultTreeDataProvider implements vscode.TreeDataProvider<vsco
 // 注册命令：查看文件详情
 export function registerShowDetailsCommand(context: vscode.ExtensionContext) {
     context.subscriptions.push(
-        vscode.commands.registerCommand('checkResult.showDetails', async ({ fileid, name, description, matchType, path }: FileTreeItem) => {
+        vscode.commands.registerCommand('hobot-checkResult.showDetails', async ({ fileid, name, description, matchType, path }: FileTreeItem) => {
 
             if (matchType === '部分匹配' || matchType === '完全匹配') {
                 const res = await matchDiff(path, fileid);
@@ -257,7 +257,7 @@ export function registerShowDetailsCommand(context: vscode.ExtensionContext) {
 // 注册命令：显示更多组件
 export function registerShowMoreModulesCommand(context: vscode.ExtensionContext, provider: CheckResultTreeDataProvider) {
     context.subscriptions.push(
-        vscode.commands.registerCommand('hobot.checkResult.showMoreModules', async () => {
+        vscode.commands.registerCommand('hobot.hobot-checkResult.showMoreModules', async () => {
             try {
                 await provider.showMore();
             } catch (error) {

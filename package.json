@@ -22,32 +22,32 @@
     "contributes": {
         "commands": [
             {
-                "command": "hobot-vscode.checkResult.refresh",
+                "command": "hobot-vscode.hobot-checkResult.refresh",
                 "category": "库博软件成分分析与同源漏洞检测工具",
                 "title": "刷新检测结果",
                 "icon": "$(refresh)"
             },
             {
-                "command": "hobot-vscode.checkResult.showBugs",
+                "command": "hobot-vscode.hobot-checkResult.showBugs",
                 "title": "获取组件漏洞",
                 "icon": "$(bug)"
             },
             {
-                "command": "hobot-vscode.checkResult.listTree",
+                "command": "hobot-vscode.hobot-checkResult.listTree",
                 "title": "树形展开",
                 "icon": "$(list-tree)"
             },
             {
-                "command": "hobot-vscode.checkResult.listFlat",
+                "command": "hobot-vscode.hobot-checkResult.listFlat",
                 "title": "平铺",
                 "icon": "$(list-flat)"
             },
             {
-                "command": "hobot-vscode.checkResult.checkFolder",
+                "command": "hobot-vscode.hobot-checkResult.checkFolder",
                 "title": "hobot: 检测当前文件夹"
             },
             {
-                "command": "hobot-vscode.checkResult.checkWorkSpaceProject",
+                "command": "hobot-vscode.hobot-checkResult.checkWorkSpaceProject",
                 "title": "hobot: 检测当前工作空间项目"
             }
         ],
@@ -63,26 +63,26 @@
         "menus": {
             "view/title": [
                 {
-                    "command": "hobot-vscode.checkResult.refresh",
-                    "when": "view == checkResult",
+                    "command": "hobot-vscode.hobot-checkResult.refresh",
+                    "when": "view == hobot-checkResult",
                     "group": "navigation"
                 }
             ],
             "view/item/context": [
                 {
-                    "command": "hobot-vscode.checkResult.showBugs",
-                    "when": "view == checkResult && viewItem == hasBug",
+                    "command": "hobot-vscode.hobot-checkResult.showBugs",
+                    "when": "view == hobot-checkResult && viewItem == hasBug",
                     "group": "inline"
                 }
             ],
             "explorer/context": [
                 {
-                    "command": "hobot-vscode.checkResult.checkFolder",
+                    "command": "hobot-vscode.hobot-checkResult.checkFolder",
                     "group": "menu",
                     "when": "explorerResourceIsFolder"
                 },
                 {
-                    "command": "hobot-vscode.checkResult.checkWorkSpaceProject",
+                    "command": "hobot-vscode.hobot-checkResult.checkWorkSpaceProject",
                     "group": "menu"
                 }
             ]
@@ -90,7 +90,7 @@
         "views": {
             "hobot": [
                 {
-                    "id": "checkResult",
+                    "id": "hobot-checkResult",
                     "name": "包含组件"
                 },
                 {
