@@ -185,10 +185,9 @@ export const statusVerification = async () => {
                     { label: '否', description: '直接获取检测结果' }
                 ], {
                     title: '项目已完成检测，是否重新检测？',
-                    ignoreFocusOut: true,
                 });
                 if (reCheck?.label === '重新上传') {
-                    const  [tmpZipPath, cleanupCallback]  = await compressFolderInTemp(projectPath);
+                    const [tmpZipPath, cleanupCallback] = await compressFolderInTemp(projectPath);
                     tmpZipPath && await updateProject(tmpZipPath, projectName, projectId);
                     cleanupCallback();
                     onlyCheckProject(projectId);
@@ -198,8 +197,11 @@ export const statusVerification = async () => {
                     onlyCheckProject(projectId);
                     showCheckProgress(projectName, projectId, analysisRate);
                     return;
-                } else {
+                } else if (reCheck?.label === '否') {
                     vscode.commands.executeCommand('hobot-vscode.hobot-checkResult.refresh');
+                    return;
+                }
+                else {
                     return;
                 }
             } else if (analysisRate >= 0 || analysisRate < 100 || analysisRate === -3) {
@@ -210,12 +212,14 @@ export const statusVerification = async () => {
                     { label: '否', description: '进行检测' }
                 ], {
                     title: `项目${getCheckStatusName(analysisRate)}，是否重新上传？`,
-                    ignoreFocusOut: true,
                 });
                 if (reUpload?.label === '是') {
                     const [tmpZipPath, cleanupCallback] = await compressFolderInTemp(projectPath);
                     tmpZipPath && await updateProject(tmpZipPath, projectName, projectId);
-                    cleanupCallback()
+                    cleanupCallback();
+                } else if (reUpload?.label === '否') {
+                } else {
+                    return;
                 }
                 onlyCheckProject(projectId);
                 showCheckProgress(projectName, projectId, analysisRate);
